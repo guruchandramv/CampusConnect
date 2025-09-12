@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — CampusConnect</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <div class="logo-mark">CC</div>
+      <span>CampusConnect</span>
+    </a>
+    <div class="navbar-right">
+      <div class="navbar-user">
+        <span id="navbar-user-name">User</span>
+        <span id="navbar-user-role" class="user-badge">student</span>
+      </div>
+      <button id="theme-toggle" class="btn-icon">☀️</button>
+      <button id="logout-btn" class="btn-icon btn-logout">⇠ Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem;">
+        <div style="font-size:1.75rem;">👋</div>
+        <h1 class="page-title" id="greeting-text">Good morning</h1>
+      </div>
+      <p class="page-subtitle" id="greeting-sub">Here's what's happening on campus today</p>
+      <div class="accent-line"></div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">10</div>
+        <div class="stat-label">Events This Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Active Notices</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">24</div>
+        <div class="stat-label">Lost Items Listed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--amber)">3</div>
+        <div class="stat-label">Items Found Today</div>
+      </div>
+    </div>
+
+    <!-- Main Nav Cards -->
+    <div style="margin-bottom:1rem;">
+      <h2 style="font-family:var(--font-display);font-size:1rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:1.25rem;">Quick Access</h2>
+    </div>
+    <div class="dashboard-grid">
+      <a href="events.html" class="dash-card">
+        <div class="dash-card-icon icon-teal">📅</div>
+        <div>
+          <div class="dash-card-label">Events</div>
+          <div class="dash-card-desc">Browse upcoming campus events — tech talks, cultural fests, hackathons and more.</div>
+        </div>
+        <div class="dash-card-arrow">→</div>
+      </a>
+
+      <a href="notice.html" class="dash-card">
+        <div class="dash-card-icon icon-amber">📋</div>
+        <div>
+          <div class="dash-card-label">Notices</div>
+          <div class="dash-card-desc">Stay updated with official announcements from departments and administration.</div>
+        </div>
+        <div class="dash-card-arrow">→</div>
+      </a>
+
+      <a href="lostfound.html" class="dash-card">
+        <div class="dash-card-icon icon-blue">🔍</div>
+        <div>
+          <div class="dash-card-label">Lost & Found</div>
+          <div class="dash-card-desc">Report a lost item or help return something you've found on campus.</div>
+        </div>
+        <div class="dash-card-arrow">→</div>
+      </a>
+    </div>
+
+    <!-- Footer note -->
+    <div style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;">
+      <div style="font-size:0.82rem;color:var(--text-muted);">CampusConnect · Built with Docker + C++ CGI</div>
+      <div style="font-size:0.82rem;color:var(--text-muted);" id="current-date"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      Auth.requireAuth();
+      Auth.initNavbar();
+
+      const user = Auth.getUser();
+      const hour = new Date().getHours();
+      const greetings = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      document.getElementById('greeting-text').textContent = `${greetings}, ${user.name.split(' ')[0]}`;
+      document.getElementById('greeting-sub').textContent = `Here's what's happening on campus today`;
+      document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-IN', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    });
+  </script>
+</body>
+</html>
