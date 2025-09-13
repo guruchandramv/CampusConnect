@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notices — CampusConnect</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <div class="logo-mark">CC</div>
+      <span>CampusConnect</span>
+    </a>
+    <div class="navbar-right">
+      <div class="navbar-user">
+        <span id="navbar-user-name">User</span>
+        <span id="navbar-user-role" class="user-badge">student</span>
+      </div>
+      <button id="theme-toggle" class="btn-icon">☀️</button>
+      <button id="logout-btn" class="btn-icon btn-logout">⇠ Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">← Back</button>
+        <h1 class="page-title" style="margin-top:0.75rem;">Campus Notices</h1>
+        <p class="page-subtitle">Official announcements and important updates</p>
+        <div class="accent-line"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;color:var(--text-muted);font-size:0.85rem;padding-top:2rem;">
+        <span>📋</span>
+        <span id="notice-count">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="filter-row">
+      <div class="search-box" style="max-width:480px;">
+        <input type="text" id="search-input" placeholder="Search notices..." oninput="filterNotices()" />
+      </div>
+    </div>
+
+    <div class="notice-list" id="notice-list">
+      <!-- Notices injected by JS -->
+    </div>
+
+    <div id="empty-notices" class="empty-state" style="display:none;">
+      <div class="empty-state-icon">📭</div>
+      <div class="empty-state-text">No notices match your search.</div>
+    </div>
+  </div>
+
+  <script>
+    const notices = [
+      {
+        title: "Semester Exams Schedule Released",
+        date: "2025-10-01",
+        content: "The schedule for the upcoming semester exams is now available on the academic portal. Please check your respective departments for detailed timings and venue information.",
+        priority: "high"
+      },
+      {
+        title: "Library Renovation Notice",
+        date: "2025-09-25",
+        content: "The campus library will be closed for renovations from October 5th to October 20th. Digital resources remain available 24/7. Please plan your study sessions accordingly.",
+        priority: "medium"
+      },
+      {
+        title: "Guest Lecture: AI and Machine Learning",
+        date: "2025-10-05",
+        content: "Join us for a guest lecture by Dr. Anita Sharma on October 10th in the main auditorium, discussing the latest trends in AI and ML across industries.",
+        priority: "low"
+      },
+      {
+        title: "Annual Cultural Fest Registration Open",
+        date: "2025-09-20",
+        content: "Registrations for the Annual Cultural Fest are now open. All students are encouraged to participate in various events. Register online before October 15th to secure your spot.",
+        priority: "medium"
+      },
+      {
+        title: "COVID-19 Safety Guidelines Update",
+        date: "2025-09-15",
+        content: "Updated safety guidelines have been issued by the health committee. Masks are mandatory in all indoor spaces and social distancing must be maintained in common areas.",
+        priority: "high"
+      },
+      {
+        title: "Sports Meet 2025 — Participation Details",
+        date: "2025-09-10",
+        content: "The inter-college sports meet will be held on October 12–15. Students interested in participating should contact the sports department by October 1st for registration.",
+        priority: "low"
+      },
+      {
+        title: "New Elective: Data Science Fundamentals",
+        date: "2025-09-08",
+        content: "A new elective course on Data Science Fundamentals will be offered from the next semester. Seats are limited. Eligible final-year students may apply through the academic office.",
+        priority: "low"
+      },
+      {
+        title: "Scholarship Applications Now Open",
+        date: "2025-09-05",
+        content: "Applications for the academic excellence scholarship are now open for meritorious students. Submit all documents and a faculty recommendation by October 1st.",
+        priority: "high"
+      }
+    ];
+
+    const priorityColors = {
+      high: 'linear-gradient(180deg, var(--red-soft), rgba(231,111,81,0.2))',
+      medium: 'linear-gradient(180deg, var(--amber), rgba(244,162,97,0.2))',
+      low: 'linear-gradient(180deg, var(--teal), rgba(0,201,167,0.2))'
+    };
+
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' });
+    }
+
+    function renderNotices(list) {
+      const container = document.getElementById('notice-list');
+      const empty = document.getElementById('empty-notices');
+      if (list.length === 0) {
+        container.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      container.innerHTML = list.map((n, i) => `
+        <div class="notice-card" style="animation-delay:${i * 0.06}s">
+          <div class="notice-indicator" style="background:${priorityColors[n.priority || 'low']}"></div>
+          <div class="notice-content-wrap">
+            <div class="notice-title">${n.title}</div>
+            <div class="notice-date">📅 ${formatDate(n.date)}</div>
+            <div class="notice-body">${n.content}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterNotices() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const filtered = notices.filter(n =>
+        !query || n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query)
+      );
+      renderNotices(filtered);
+      document.getElementById('notice-count').textContent = `${filtered.length} notice${filtered.length !== 1 ? 's' : ''}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Auth.requireAuth();
+      Auth.initNavbar();
+      renderNotices(notices);
+      document.getElementById('notice-count').textContent = `${notices.length} notices`;
+    });
+  </script>
+</body>
+</html>
