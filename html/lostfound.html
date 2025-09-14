@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lost & Found — CampusConnect</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="dashboard.html" class="navbar-brand">
+      <div class="logo-mark">CC</div>
+      <span>CampusConnect</span>
+    </a>
+    <div class="navbar-right">
+      <div class="navbar-user">
+        <span id="navbar-user-name">User</span>
+        <span id="navbar-user-role" class="user-badge">student</span>
+      </div>
+      <button id="theme-toggle" class="btn-icon">☀️</button>
+      <button id="logout-btn" class="btn-icon btn-logout">⇠ Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="page-header">
+      <button class="btn-back" onclick="window.location.href='dashboard.html'">← Back</button>
+      <h1 class="page-title" style="margin-top:0.75rem;">Lost & Found</h1>
+      <p class="page-subtitle">Help reunite lost items with their owners</p>
+      <div class="accent-line"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;" class="lf-layout">
+      <!-- Report Form -->
+      <div class="lf-form-card">
+        <h2 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:1.25rem;color:var(--text-primary);">
+          Report an Item
+        </h2>
+
+        <!-- Lost / Found Toggle -->
+        <div class="lf-type-toggle" id="type-toggle">
+          <button class="type-chip active-lost" onclick="selectType('lost', this)" id="chip-lost">🚨 Lost</button>
+          <button class="type-chip" onclick="selectType('found', this)" id="chip-found">✅ Found</button>
+        </div>
+        <input type="hidden" id="item-status" value="lost" />
+
+        <div class="form-group">
+          <label class="form-label">Item Name</label>
+          <input class="form-control" type="text" id="item-name" placeholder="e.g. Blue water bottle" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" id="item-desc" rows="4" placeholder="Describe the item — color, brand, where it was last seen..." style="resize:vertical;min-height:100px;" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input class="form-control" type="text" id="item-location" placeholder="e.g. Library 2nd floor, Cafeteria" />
+        </div>
+
+        <button class="btn btn-primary" id="submit-btn" onclick="submitReport()">
+          Submit Report
+        </button>
+      </div>
+
+      <!-- Info / Tips Panel -->
+      <div style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+          <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--text-primary);">📌 How it works</h3>
+          <div style="display:flex;flex-direction:column;gap:0.85rem;">
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--teal-glow);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--teal);font-weight:700;flex-shrink:0;">1</div>
+              <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.5;">Select whether you <strong style="color:var(--red-soft)">lost</strong> or <strong style="color:var(--teal)">found</strong> an item on campus.</div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--teal-glow);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--teal);font-weight:700;flex-shrink:0;">2</div>
+              <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.5;">Fill in details about the item — be as specific as possible to help identify it.</div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--teal-glow);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--teal);font-weight:700;flex-shrink:0;">3</div>
+              <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.5;">Submit your report — campus staff will follow up through your registered email.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,201,167,0.06);border:1px solid var(--border-accent);border-radius:var(--radius);padding:1.25rem;">
+          <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">
+            <strong style="color:var(--teal);font-family:var(--font-display);">💡 Tips for faster recovery</strong><br /><br />
+            Include the last known location, date, and any unique identifiers like initials, stickers, or serial numbers. Found items are kept at the Security Office (Block A, Ground Floor).
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;">
+          <div style="font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:0.75rem;">Contact</div>
+          <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.7;">
+            📞 Security Office: Ext. 1001<br />
+            🏢 Block A, Ground Floor<br />
+            🕐 Open 24/7
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 700px) {
+      .lf-layout { grid-template-columns: 1fr !important; }
+    }
+    textarea.form-control { background: var(--navy); }
+    body.light-mode textarea.form-control { background: var(--navy-mid); }
+  </style>
+
+  <script>
+    let currentType = 'lost';
+
+    function selectType(type, el) {
+      currentType = type;
+      document.getElementById('item-status').value = type;
+      document.getElementById('chip-lost').className = 'type-chip' + (type === 'lost' ? ' active-lost' : '');
+      document.getElementById('chip-found').className = 'type-chip' + (type === 'found' ? ' active-found' : '');
+    }
+
+    async function submitReport() {
+      const name = document.getElementById('item-name').value.trim();
+      const desc = document.getElementById('item-desc').value.trim();
+      const location = document.getElementById('item-location').value.trim();
+      const status = document.getElementById('item-status').value;
+      const userId = localStorage.getItem('CampusConnectUserId') || '';
+
+      if (!name || !desc) {
+        Toast.show('Please fill in item name and description', 'error');
+        return;
+      }
+
+      if (!userId) {
+        Toast.show('You are not logged in', 'error');
+        setTimeout(() => window.location.href = '/index.html', 1000);
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.classList.add('loading');
+      btn.textContent = '';
+
+      const formData = new URLSearchParams({
+        item_name: name,
+        description: desc,
+        status: status,
+        reported_by: userId,
+        location: location
+      });
+
+      try {
+        const res = await fetch('/cgi-bin/lostfound_submit.cgi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formData
+        });
+
+        if (!res.ok) throw new Error('Server error');
+
+        const result = await res.json();
+        if (result.status === 'success') {
+          Toast.show(result.message || 'Report submitted successfully!', 'success');
+          document.getElementById('item-name').value = '';
+          document.getElementById('item-desc').value = '';
+          document.getElementById('item-location').value = '';
+        } else {
+          Toast.show(result.message || 'Failed to submit report', 'error');
+        }
+      } catch (e) {
+        Toast.show('Unable to connect to server', 'error');
+        console.error(e);
+      } finally {
+        btn.classList.remove('loading');
+        btn.textContent = 'Submit Report';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Auth.requireAuth();
+      Auth.initNavbar();
+    });
+  </script>
+</body>
+</html>
