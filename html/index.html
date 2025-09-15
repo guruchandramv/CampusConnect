@@ -1,9 +1,166 @@
-<div class="auth-container">
-    <h1>CampusConnect</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusConnect — Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="auth-bg-pattern"></div>
+  <div class="auth-grid-overlay"></div>
 
-    <form id="loginForm">
-        <input type="text" placeholder="Username"><br/><br/>
-        <input type="password" placeholder="Password"><br/><br/>
-        <button>Login</button>
-    </form>
-</div>
+  <button id="theme-toggle" class="btn-icon" style="position:fixed;top:1rem;right:1rem;z-index:200;" title="Toggle theme">☀️</button>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="logo-mark">CC</div>
+        <div class="auth-brand-text">
+          <h1>CampusConnect</h1>
+          <p>Your campus, all in one place</p>
+        </div>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login', this)">Sign In</button>
+        <button class="auth-tab" onclick="switchTab('register', this)">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-section">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email</label>
+          <input class="form-control" type="email" id="login-email" name="email" placeholder="you@college.edu" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input class="form-control" type="password" id="login-password" name="password" placeholder="••••••••" required />
+        </div>
+        <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">
+          Sign In
+        </button>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-section" style="display:none;">
+        <div class="form-group">
+          <label class="form-label" for="reg-name">Full Name</label>
+          <input class="form-control" type="text" id="reg-name" name="name" placeholder="Your full name" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email</label>
+          <input class="form-control" type="email" id="reg-email" name="email" placeholder="you@college.edu" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Password</label>
+          <input class="form-control" type="password" id="reg-password" name="password" placeholder="Create a password" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-role">Role</label>
+          <select class="form-control" id="reg-role" name="role" required>
+            <option value="">Select your role</option>
+            <option value="student">Student</option>
+            <option value="faculty">Faculty</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="register-btn" onclick="handleRegister()">
+          Create Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab, el) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('login-section').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('register-section').style.display = tab === 'register' ? 'block' : 'none';
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      if (!email || !password) { Toast.show('Please fill in all fields', 'error'); return; }
+
+      const btn = document.getElementById('login-btn');
+      btn.classList.add('loading');
+      btn.textContent = '';
+
+      const formData = new URLSearchParams({ action: 'login', email, password });
+      try {
+        const res = await fetch('/cgi-bin/register_login.cgi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formData
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+          localStorage.setItem('CampusConnectUserId', result.user_id || '');
+          localStorage.setItem('CampusConnectUserRole', result.role || 'student');
+          localStorage.setItem('CampusConnectUserName', result.name || '');
+          Toast.show('Welcome back!', 'success', 1200);
+          setTimeout(() => window.location.href = '/dashboard.html', 800);
+        } else {
+          Toast.show(result.message || 'Login failed', 'error');
+          btn.classList.remove('loading');
+          btn.textContent = 'Sign In';
+        }
+      } catch (e) {
+        Toast.show('Unable to connect to server', 'error');
+        btn.classList.remove('loading');
+        btn.textContent = 'Sign In';
+      }
+    }
+
+    async function handleRegister() {
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const role = document.getElementById('reg-role').value;
+      if (!name || !email || !password || !role) { Toast.show('Please fill in all fields', 'error'); return; }
+
+      const btn = document.getElementById('register-btn');
+      btn.classList.add('loading');
+      btn.textContent = '';
+
+      const formData = new URLSearchParams({ action: 'register', name, email, password, role });
+      try {
+        const res = await fetch('/cgi-bin/register_login.cgi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formData
+        });
+        const text = await res.text();
+        let result;
+        try { result = JSON.parse(text); } catch { result = { status: 'error', message: 'Invalid server response' }; }
+        if (result.status === 'success') {
+          Toast.show('Account created! Please sign in.', 'success');
+          document.querySelectorAll('.auth-tab')[0].click();
+          document.getElementById('reg-name').value = '';
+          document.getElementById('reg-email').value = '';
+          document.getElementById('reg-password').value = '';
+          document.getElementById('reg-role').value = '';
+        } else {
+          Toast.show(result.message || 'Registration failed', 'error');
+        }
+      } catch (e) {
+        Toast.show('Unable to connect to server', 'error');
+      } finally {
+        btn.classList.remove('loading');
+        btn.textContent = 'Create Account';
+      }
+    }
+
+    // Enter key support
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const loginVisible = document.getElementById('login-section').style.display !== 'none';
+        if (loginVisible) handleLogin(); else handleRegister();
+      }
+    });
+  </script>
+</body>
+</html>
