@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./cgi-bin:/usr/lib/cgi-bin
+      - ./html:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: yourpassword
+      MYSQL_DATABASE: student_mgmt
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data: {}
